@@ -1,7 +1,7 @@
 ## Marketplace with Laravel 6.*
 
 ## Instalation
--[command] use [composer install]
+-[command] **composer install**
 
 ## Running
--[command] use [php artisan serve]
+-[command] **php artisan serve**
