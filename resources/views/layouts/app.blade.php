@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="margin-bottom:40px">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <a class="navbar-brand" href="{{route('home')}}">Marketplace</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -16,11 +16,14 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             @auth
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item @if(request()->is('admin/stores')) active @endif">
+                    <li class="nav-item @if(request()->is('admin/stores*')) active @endif">
                         <a class="nav-link" href="{{route('admin.stores.index')}}">Lojas</a>
                     </li>
-                    <li class="nav-item  @if(request()->is('admin/products')) active @endif">
-                    <a class="nav-link" href="{{route('admin.products.index')}}">Produtos</a>
+                    <li class="nav-item  @if(request()->is('admin/products*')) active @endif">
+                        <a class="nav-link" href="{{route('admin.products.index')}}">Produtos</a>
+                    </li>
+                    <li class="nav-item  @if(request()->is('admin/categories*')) active @endif">
+                        <a class="nav-link" href="{{route('admin.categories.index')}}">Categorias</a>
                     </li>
                 </ul>
                 <div class="form-inline my-2 my-lg-0">
@@ -48,7 +51,7 @@
             @endauth
         </div>
     </nav>
-    <div class="container">
+    <div class="container"  style="margin-top:80px">
         @include('flash::message')
         @yield('content')
     </div>

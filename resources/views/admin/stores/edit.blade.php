@@ -2,7 +2,7 @@
 
 @section('content')
     <h1>Editar Loja</h1>
-    <form action="{{route('admin.stores.update', ['store' => $store->id])}}" method="post">
+    <form action="{{route('admin.stores.update', ['store' => $store->id])}}" method="post" enctype="multipart/form-data">
         @csrf
         @method("PUT")
 
@@ -28,7 +28,7 @@
         </div>
         <div class="form-group">
             <label for="">Telefone</label>
-            <input type="text" name="phone" class="form-control  @error('phone') is-invalid @enderrorl" value="{{$store->phone}}">
+            <input type="text" name="phone" class="form-control  @error('phone') is-invalid @enderror" value="{{$store->phone}}">
             
             @error('phone')
                 <div class="invalid-feedback">
@@ -46,10 +46,21 @@
                 </div>
             @enderror
         </div>
+
         <div class="form-group">
-            <label for="">Slug</label>
-            <input type="text" name="slug" class="form-control" value="{{$store->slug}}">
+            <p>
+                <img src="{{asset('storage/' . $store->logo)}}" alt="" class="img-fluid w-50">
+            </p>
+            <label for="">Logo</label>
+            <input type="file" name="logo" class="form-control @error('logo') is-invalid @enderror">
+
+            @error('logo')
+                <div class="invalid-feedback">
+                    {{$message}}
+                </div>
+            @enderror
         </div>
+        
         <div>
             <button type="submit"  class="btn btn-lg btn-success">Atualizar Loja</button>
         </div>

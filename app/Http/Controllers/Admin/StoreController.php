@@ -5,27 +5,43 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreRequest;
+use App\Traits\UploadTrait;
+use Illuminate\Support\Facades\Storage;
 
 class StoreController extends Controller
 {
+    use UploadTrait;
+
+    public function __construct()
+    {
+        $this->middleware('user.has.store')->only(['create', 'store']);
+    }
+
     public function index()
     {
-        $stores = \App\Store::paginate(10);
+        $store = auth()->user()->store;
 
-        return view('admin.stores.index', compact('stores'));
+        if (!$store) {
+            return redirect()->route('admin.stores.create');
+        }
+
+        return view('admin.stores.index', compact('store'));
     }
 
     public function create()
     {
-        $users = \App\User::all(['id', 'name']);
-
-        return view('admin.stores.create', compact('users'));
+        return view('admin.stores.create');
     }
 
     public function store(StoreRequest $request)
     {
         $data = $request->all();
         $user = auth()->user();
+
+        if ($request->hasFile('logo'))
+        {
+            $data['logo'] = $this->imageUpload($request->file('logo'));
+        }
 
         if ($user->store()->count() == 1)
         {
@@ -46,26 +62,39 @@ class StoreController extends Controller
         return view('admin.stores.edit', compact('store'));
     }
     
-    public function update(StoreRequest $request, $store)
+    public function update(StoreRequest $request)
     {
         $data = $request->all();
 
-        $store = \App\Store::find($store);
+        $store = auth()->user()->store;
+        
+        if ($request->hasFile('logo'))
+        {
+            if(Storage::disk('public')->exists($store->logo))
+            {
+                Storage::disk('public')->delete($store->logo);
+            }
+            
+            $data['logo'] = $this->imageUpload($request->file('logo'));
+        }
+
         $store->update($data);
 
         flash('Loja ATUALIZADA com Sucesso')->success();
         return redirect()->route('admin.stores.index');
     }
 
-    public function destroy($store)
+    public function destroy()
     {
-        $store = \App\Store::find($store);
+        $store = auth()->user()->store;
 
-        $products = \App\Product::where('store_id', $store->id);
-        
-        if ($products->count() > 0)
+        $products = $store->products()->get();
+
+        foreach($products as $product)
         {
-            $products->delete();
+            $product->photos()->delete();
+            $product->categories()->sync([]);
+            $product->delete();
         }
 
         $store->delete();
